@@ -44,6 +44,7 @@ static PyObject *CreateShortcut(PyObject *self, PyObject *args)
     int iconindex = 0;
     PyObject *py_workdir = NULL;
     PyObject *py_app_id = NULL;
+    int window_style = 0;
 
     IShellLink *pShellLink = NULL;
     IPersistFile *pPersistFile = NULL;
@@ -59,9 +60,10 @@ static PyObject *CreateShortcut(PyObject *self, PyObject *args)
         goto error;
     }
 
-    if (!PyArg_ParseTuple(args, "UUU|UUUiU",
+    if (!PyArg_ParseTuple(args, "UUU|UUUiUi",
                           &py_path, &py_description, &py_filename,
-                          &py_arguments, &py_workdir, &py_iconpath, &iconindex, &py_app_id)) {
+                          &py_arguments, &py_workdir, &py_iconpath, &iconindex, &py_app_id,
+                          &window_style)) {
         goto error;
     }
 
@@ -179,6 +181,15 @@ static PyObject *CreateShortcut(PyObject *self, PyObject *args)
         pPropertyStore->Release();
     }
 
+    if (window_style != 0) {
+        hres = pShellLink->SetShowCmd(window_style);
+        if (FAILED(hres)) {
+            PyErr_Format(PyExc_OSError,
+                           "SetShowCmd() error 0x%x", hres);
+            goto error;
+        }
+    }
+
     hres = pPersistFile->Save(filename, TRUE);
     if (FAILED(hres)) {
         PyObject *fn = PyUnicode_FromWideChar(filename, wcslen(filename));
@@ -234,7 +245,10 @@ PyMethodDef meth[] = {
     {"create_shortcut", CreateShortcut, METH_VARARGS,
         "winshortcut.create_shortcut(path, description, filename,\n"
         "                  arguments=u\"\", workdir=None, iconpath=None,\n"
-        "                  iconindex=0, app_id=None)\n"
+        "                  iconindex=0, app_id=None, window_style=1)\n"
+        "\n"
+        "  window_style: Initial window state (1=normal,\n"
+        "                3=maximized, 7=minimized).\n"
         "\n"
         "  Creates a shortcut ``filename`` (a .lnk file), whose\n"
         "  target path is ``path``. All the input strings must be\n"

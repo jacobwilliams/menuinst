@@ -182,10 +182,21 @@ class WindowsMenuItem(MenuItem):
 
             icon = self.render_key("icon") or ""
 
+            # Map window_style string to Windows ShowCmd constants:
+            # SW_SHOWNORMAL=1, SW_SHOWMAXIMIZED=3, SW_SHOWMINNOACTIVE=7
+            _WINDOW_STYLE_TO_SHOWCMD = {
+                "normal": 1,
+                "maximized": 3,
+                "minimized": 7,
+            }
+            window_style = self.render_key("window_style")
+            show_cmd = _WINDOW_STYLE_TO_SHOWCMD.get(window_style, 1)
+
             # winshortcut is a windows-only C extension! create_shortcut has this API
             # Notice args must be passed as positional, no keywords allowed!
             # winshortcut.create_shortcut(path, description, filename, arguments="",
-            #                             workdir=None, iconpath=None, iconindex=0, app_id="")
+            #                             workdir=None, iconpath=None, iconindex=0, app_id="",
+            #                             window_style=1)
             if Path(path).exists():
                 log.warning("%s: Overwriting existing link at %s.", self._log_name, path)
             create_shortcut(
@@ -197,6 +208,7 @@ class WindowsMenuItem(MenuItem):
                 icon,
                 0,
                 self._app_user_model_id(),
+                show_cmd,
             )
 
         for location in self.menu.terminal_profile_locations:

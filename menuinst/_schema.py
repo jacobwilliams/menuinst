@@ -199,6 +199,16 @@ class Windows(BasePlatformSpecific):
             """
         ),
     )
+    window_style: Optional[Literal["normal", "maximized", "minimized"]] = Field(
+        None,
+        description=(
+            """
+            Initial window state when the application is launched via this shortcut.
+            Accepted values are 'normal', 'maximized', and 'minimized'.
+            Defaults to 'normal'.
+            """
+        ),
+    )
 
 
 class Linux(BasePlatformSpecific):

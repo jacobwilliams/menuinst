@@ -822,6 +822,17 @@
           "maxLength": 128,
           "pattern": "\\S+\\.\\S+",
           "type": "string"
+        },
+        "window_style": {
+          "title": "Window Style",
+          "description": "Initial window state when the application is launched via this shortcut. Accepted values are 'normal', 'maximized', and 'minimized'. Defaults to 'normal'.",
+          "markdownDescription": "Initial window state when the application is launched via this shortcut. Accepted values are `'normal'`, `'maximized'`, and `'minimized'`. Defaults to `'normal'`.",
+          "enum": [
+            "normal",
+            "maximized",
+            "minimized"
+          ],
+          "type": "string"
         }
       },
       "additionalProperties": false,
